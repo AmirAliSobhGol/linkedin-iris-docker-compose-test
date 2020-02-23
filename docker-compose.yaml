@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  oncall-web:
+    image: quay.io/iris/oncall
+    ports:
+      - "8080:8080"
+    environment:
+      - DOCKER_DB_BOOTSTRAP=1
+    volumes:
+      - ./config/oncall:/home/oncall/config/
+
+  iris-mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: iris
+      MYSQL_DATABASE: iris
+      MYSQL_USER: iris
+      MYSQL_PASSWORD: iris
+
+  iris-api:
+    image: quay.io/iris/iris
+    ports:
+      - '16649:16649'
+      - '8002:8002'
+    restart: always
+    environment:
+      # This makes iris-api initialize the db schema upon first run
+      DOCKER_DB_BOOTSTRAP: 'true'
+    volumes:
+      - ./config/iris-api:/home/iris/config
+
+  oncall-mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: oncall
+      MYSQL_DATABASE: oncall
+      MYSQL_USER: oncall
+      MYSQL_PASSWORD: oncall
